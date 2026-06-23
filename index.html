@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiniela Mundial 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Condensed:wght@700&display=swap');
+        :root {
+            --primary: 16 185 129;
+        }
+        .tail-container {
+            font-family: 'Inter', system_ui, sans-serif;
+        }
+        .title-font {
+            font-family: 'Roboto Condensed', sans-serif;
+        }
+        .match-card {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .match-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.4);
+        }
+        .nav-active {
+            border-bottom: 3px solid rgb(16 185 129);
+            color: white;
+            background-color: rgba(16, 185, 129, 0.05);
+        }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+<body class="tail-container bg-zinc-950 text-zinc-200 min-h-screen">
+    <div class="max-w-7xl mx-auto">
+        <header class="bg-black border-b border-emerald-950 sticky top-0 z-50">
+            <div class="px-6 py-4 flex items-center justify-between">
+                <div class="flex items-center gap-x-3">
+                    <div class="w-10 h-10 bg-emerald-500 rounded-2xl flex items-center justify-center text-white text-2xl font-bold shadow-inner animate-pulse">⚽</div>
+                    <div>
+                        <h1 class="title-font text-3xl font-bold tracking-tighter text-white">QUINIELA</h1>
+                        <p class="text-emerald-400 text-sm -mt-1 font-semibold tracking-widest">MUNDIAL 2026</p>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center gap-x-1 text-sm font-medium">
+                    <button onclick="navigate(0)" class="nav-btn nav-active flex items-center gap-x-2 px-4 py-3 hover:text-emerald-400 transition-colors rounded-t-xl">
+                        <i class="fas fa-trophy text-amber-400"></i>
+                        <span>PUNTUACIÓN</span>
+                    </button>
+                    <button onclick="navigate(1)" class="nav-btn flex items-center gap-x-2 px-4 py-3 hover:text-emerald-400 transition-colors rounded-t-xl">
+                        <i class="fas fa-users text-blue-400"></i>
+                        <span>MIEMBROS</span>
+                    </button>
+                    <button onclick="navigate(2)" class="nav-btn flex items-center gap-x-2 px-4 py-3 hover:text-emerald-400 transition-colors rounded-t-xl">
+                        <i class="fas fa-sitemap text-purple-400"></i>
+                        <span>LLAVES</span>
+                    </button>
+                    <button onclick="navigate(3)" class="nav-btn flex items-center gap-x-2 px-4 py-3 hover:text-emerald-400 transition-colors rounded-t-xl">
+                        <i class="fas fa-futbol text-emerald-400"></i>
+                        <span>PRONÓSTICOS</span>
+                    </button>
+                    <button onclick="navigate(4)" class="nav-btn flex items-center gap-x-2 px-4 py-3 hover:text-emerald-400 transition-colors rounded-t-xl">
+                        <i class="fas fa-clipboard-list text-rose-400"></i>
+                        <span>MARCADOR REAL</span>
+                    </button>
+                </div>
+                
+                <div class="flex items-center gap-x-2">
+                    <button onclick="exportData()" title="Exportar Copia de Seguridad"
+                            class="p-2.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white rounded-xl flex items-center gap-x-2 transition-colors border border-zinc-800">
+                        <i class="fas fa-download"></i>
+                        <span class="hidden lg:inline text-xs font-semibold">Exportar</span>
+                    </button>
+                    <button onclick="importData()" title="Importar Copia de Seguridad"
+                            class="p-2.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-400 hover:text-white rounded-xl flex items-center gap-x-2 transition-colors border border-zinc-800">
+                        <i class="fas fa-upload"></i>
+                        <span class="hidden lg:inline text-xs font-semibold">Importar</span>
+                    </button>
+                    <button onclick="clearAllData()" title="Borrar todo"
+                            class="p-2.5 bg-red-950/20 hover:bg-red-900/40 text-red-400 rounded-xl flex items-center transition-colors border border-red-900/30">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="md:hidden bg-zinc-900 border-t border-zinc-800 px-2 py-2 flex gap-1 overflow-x-auto">
+                <button onclick="navigate(0)" class="nav-btn nav-active flex-1 text-[11px] py-2 px-1 rounded-xl flex flex-col items-center gap-y-1 min-w-[65px]">
+                    <i class="fas fa-trophy text-amber-400"></i>
+                    <span>Puntos</span>
+                </button>
+                <button onclick="navigate(1)" class="nav-btn flex-1 text-[11px] py-2 px-1 rounded-xl flex flex-col items-center gap-y-1 min-w-[65px]">
+                    <i class="fas fa-users text-blue-400"></i>
+                    <span>Miembros</span>
+                </button>
+                <button onclick="navigate(2)" class="nav-btn flex-1 text-[11px] py-2 px-1 rounded-xl flex flex-col items-center gap-y-1 min-w-[65px]">
+                    <i class="fas fa-sitemap text-purple-400"></i>
+                    <span>Llaves</span>
+                </button>
+                <button onclick="navigate(3)" class="nav-btn flex-1 text-[11px] py-2 px-1 rounded-xl flex flex-col items-center gap-y-1 min-w-[65px]">
+                    <i class="fas fa-futbol text-emerald-400"></i>
+                    <span>Pronos</span>
+                </button>
+                <button onclick="navigate(4)" class="nav-btn flex-1 text-[11px] py-2 px-1 rounded-xl flex flex-col items-center gap-y-1 min-w-[65px]">
+                    <i class="fas fa-clipboard-list text-rose-400"></i>
+                    <span>Real</span>
+                </button>
+            </div>
+        </header>
+
+        <main class="p-4 md:p-6">
+            
+            <div id="section-0" class="section">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-3xl font-bold title-font tracking-tight flex items-center gap-x-2">🏆 <span>Ranking General</span></h2>
+                    <div class="flex items-center gap-x-2">
+                        <button onclick="takeRankingScreenshot()" 
+                                class="px-5 py-2.5 bg-zinc-800 hover:bg-zinc-700 border border-zinc-750 rounded-xl text-sm font-semibold flex items-center gap-x-2 transition-colors shadow-lg">
+                            <i class="fas fa-camera text-emerald-400"></i>
+                            <span>Tomar Foto</span>
+                        </button>
+                        <button onclick="calculateAllPoints()" 
+                                class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 rounded-xl text-sm font-semibold flex items-center gap-x-2 transition-colors shadow-lg shadow-emerald-900/20">
+                            <i class="fas fa-sync-alt"></i>
+                            <span>Actualizar</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="inline-block min-w-full sm:min-w-[600px] bg-zinc-900 rounded-3xl border border-zinc-850 shadow-xl overflow-hidden">
+                    <div id="ranking-table"></div>
+                </div>
+                
+                <div class="mt-8 bg-zinc-900/60 rounded-3xl p-6 border border-zinc-850">
+                    <h3 class="text-lg font-semibold mb-4 flex items-center gap-x-3 text-white">
+                        <i class="fas fa-info-circle text-emerald-400"></i>
+                        <span>Sistema de Puntuación</span>
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+                        <div class="bg-black/40 p-4 rounded-2xl border border-zinc-800">
+                            <div class="text-emerald-400 font-mono text-3xl font-bold mb-1">+2 Pts</div>
+                            <div class="font-semibold text-zinc-300">Tendencia Correcta</div>
+                            <div class="text-zinc-500 text-xs mt-1">Acertar si gana local, visita o si hay un empate.</div>
+                        </div>
+                        <div class="bg-black/40 p-4 rounded-2xl border border-zinc-800">
+                            <div class="text-emerald-400 font-mono text-3xl font-bold mb-1">+2 Pts</div>
+                            <div class="font-semibold text-zinc-300">Goles del Local</div>
+                            <div class="text-zinc-500 text-xs mt-1">Acertar la cantidad exacta de goles locales.</div>
+                        </div>
+                        <div class="bg-black/40 p-4 rounded-2xl border border-zinc-800">
+                            <div class="text-emerald-400 font-mono text-3xl font-bold mb-1">+2 Pts</div>
+                            <div class="font-semibold text-zinc-300">Goles del Visitante</div>
+                            <div class="text-zinc-500 text-xs mt-1">Acertar la cantidad exacta de goles visitantes.</div>
+                        </div>
+                    </div>
+                    <p class="text-xs text-zinc-500 mt-4 italic">Nota: Máximo de 6 puntos por partido. Si dejas el pronóstico vacío (con guiones), no computará ni restará puntos.</p>
+                </div>
+            </div>
+            
+            <div id="section-1" class="section hidden">
+                <div class="max-w-md mx-auto">
+                    <h2 class="text-3xl font-bold title-font tracking-tight mb-6 flex items-center gap-x-2">👥 <span>Participantes</span></h2>
+                    
+                    <div class="bg-zinc-900 rounded-3xl p-6 border border-zinc-850 shadow-xl mb-6">
+                        <label class="block text-xs font-semibold uppercase tracking-wider mb-2 text-zinc-400">Nombre del nuevo participante</label>
+                        <div class="flex gap-x-2">
+                            <input id="new-member-name" 
+                                   onkeypress="if(event.key === 'Enter') addMember()"
+                                   class="flex-1 bg-black border border-zinc-800 focus:border-emerald-500 rounded-xl px-4 py-3 outline-none text-white text-sm transition-colors"
+                                   placeholder="Ej: Nathaly Garcia" type="text">
+                            <button onclick="addMember()" 
+                                    class="bg-emerald-600 hover:bg-emerald-500 px-6 rounded-xl font-semibold text-sm transition-colors whitespace-nowrap">
+                                Agregar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <h3 class="font-bold mb-3 text-zinc-400 text-sm px-2 flex justify-between items-center">
+                        <span>Registrados</span>
+                        <span id="member-count" class="bg-zinc-800 px-2.5 py-1 rounded-full text-xs text-emerald-400 font-mono">0</span>
+                    </h3>
+                    <div id="members-list" class="space-y-2">
+                        </div>
+                </div>
+            </div>
+            
+            <div id="section-2" class="section hidden">
+                <h2 class="text-3xl font-bold title-font tracking-tight mb-6">🔀 Llaves Eliminatorias</h2>
+                <div class="bg-zinc-900 rounded-3xl p-8 border border-zinc-850 text-center shadow-xl">
+                    <div class="max-w-lg mx-auto">
+                        <i class="fas fa-sitemap text-6xl text-emerald-500 mb-6 opacity-40"></i>
+                        <h3 class="text-xl font-semibold mb-2">Fase Eliminatoria</h3>
+                        <p class="text-zinc-400 text-sm max-w-sm mx-auto">Esta sección se activará automáticamente al terminar la fase de grupos. Usa el "Marcador Real" para armar el calendario actual.</p>
+                        <button onclick="navigate(4)" 
+                                class="mt-6 px-5 py-2.5 bg-zinc-800 hover:bg-zinc-700 rounded-xl text-xs font-semibold inline-flex items-center gap-x-2 transition-colors border border-zinc-700">
+                            <span>Ir a Calendario / Marcador Real</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="section-3" class="section hidden">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                    <h2 class="text-3xl font-bold title-font tracking-tight flex items-center gap-x-2">🔮 <span>Pronósticos</span></h2>
+                    <div class="flex items-center gap-x-3">
+                        <span class="text-xs uppercase text-zinc-400 font-medium tracking-wider hidden sm:inline">Usuario:</span>
+                        <select id="predict-member-select" 
+                                onchange="loadMemberPredictions()"
+                                class="w-full sm:w-auto bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-sm font-semibold outline-none focus:border-emerald-500">
+                            </select>
+                    </div>
+                </div>
+                
+                <div id="predictions-list" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    </div>
+                
+                <div id="no-matches-msg" class="hidden bg-zinc-900 border border-dashed border-zinc-800 rounded-3xl p-12 text-center max-w-xl mx-auto">
+                    <i class="fas fa-folder-open text-4xl text-zinc-600 mb-3"></i>
+                    <p class="text-zinc-400 text-sm">Aún no has agregado partidos en el Marcador Real.</p>
+                    <button onclick="navigate(4)" 
+                            class="mt-3 text-emerald-400 hover:text-emerald-300 font-semibold text-xs inline-flex items-center gap-x-1">
+                        <span>Crear partidos ahora</span>
+                        <i class="fas fa-arrow-right text-[10px]"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div id="section-4" class="section hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-bold title-font tracking-tight flex items-center gap-x-2">📊 <span>Calendario Real</span></h2>
+                    <button onclick="addRealMatch()" 
+                            class="bg-emerald-600 hover:bg-emerald-500 px-4 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-x-2 transition-colors shadow-lg shadow-emerald-900/20">
+                        <i class="fas fa-plus"></i>
+                        <span>Programar Partido</span>
+                    </button>
+                </div>
+                
+                <div id="new-match-form" class="hidden bg-zinc-900 border border-emerald-900/50 rounded-3xl p-5 mb-6 shadow-2xl">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-emerald-400 mb-4"><i class="fas fa-calendar-plus mr-1"></i> Programar Nuevo Partido</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[11px] uppercase tracking-widest text-zinc-400 font-semibold mb-1.5">Equipo Local</label>
+                            <select id="new-home-team" class="w-full bg-black border border-zinc-800 focus:border-emerald-500 rounded-xl px-4 py-3 text-sm outline-none">
+                                </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] uppercase tracking-widest text-zinc-400 font-semibold mb-1.5">Equipo Visitante</label>
+                            <select id="new-away-team" class="w-full bg-black border border-zinc-800 focus:border-emerald-500 rounded-xl px-4 py-3 text-sm outline-none">
+                                </select>
+                        </div>
+                    </div>
+                    <div class="flex justify-end gap-x-3 mt-5">
+                        <button onclick="cancelNewMatch()" 
+                                class="px-4 py-2 text-xs text-zinc-400 hover:text-white font-medium transition-colors">Cancelar</button>
+                        <button onclick="saveNewRealMatch()" 
+                                class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 rounded-xl text-xs font-bold transition-colors shadow-md">
+                            Agregar al fixture
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="real-matches-list" class="space-y-3">
+                    </div>
+            </div>
+        </main>
+        
+        <footer class="border-t border-zinc-900 py-6 px-6 text-center text-xs text-zinc-500">
+            <p>Quiniela Mundial 2026 • Guardado automático en <span class="font-mono text-amber-400">localStorage</span></p>
+        </footer>
+    </div>
+
+    <div id="toast" class="hidden fixed bottom-6 right-6 bg-zinc-900 border border-emerald-500 text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-x-3 z-50 transition-all duration-300 transform translate-y-20">
+        <div class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs">
+            <i class="fas fa-check"></i>
+        </div>
+        <span id="toast-text" class="text-xs font-semibold tracking-wide"></span>
+    </div>
+
+    <script>
+        // LISTA OFICIAL Y COMPLETA DE LOS 48 PAÍSES CLASIFICADOS (MUNDIAL 2026)
+        let teams = [
+            "Alemania", "Arabia Saudita", "Argelia", "Argentina", "Australia", "Austria", 
+            "Bélgica", "Bosnia y Herzegovina", "Brasil", "Cabo Verde", "Canadá", "Catar", 
+            "Colombia", "Corea del Sur", "Costa de Marfil", "Croacia", "Curazao", "Ecuador", 
+            "Egipto", "Escocia", "España", "Estados Unidos", "Francia", "Ghana", "Haití", 
+            "Inglaterra", "Irak", "Irán", "Japón", "Jordania", "Marruecos", "México", 
+            "Noruega", "Nueva Zelanda", "Países Bajos", "Panamá", "Paraguay", "Portugal", 
+            "República Checa", "RD Congo", "Senegal", "Sudáfrica", "Suecia", "Suiza", 
+            "Túnez", "Turquía", "Uruguay", "Uzbekistán"
+        ].sort();
+        
+        let members = [];
+        let realMatches = []; 
+        let predictions = {}; 
+        
+        let currentMatchId = 1;
+        
+        function loadData() {
+            const savedMembers = localStorage.getItem('quiniela_members');
+            if (savedMembers) members = JSON.parse(savedMembers);
+            
+            const savedMatches = localStorage.getItem('quiniela_real_matches');
+            if (savedMatches) {
+                realMatches = JSON.parse(savedMatches);
+                if (realMatches.length > 0) {
+                    currentMatchId = Math.max(...realMatches.map(m => m.id)) + 1;
+                }
+            }
+            
+            const savedPreds = localStorage.getItem('quiniela_predictions');
+            if (savedPreds) predictions = JSON.parse(savedPreds);
+        }
+        
+        function saveData() {
+            localStorage.setItem('quiniela_members', JSON.stringify(members));
+            localStorage.setItem('quiniela_real_matches', JSON.stringify(realMatches));
+            localStorage.setItem('quiniela_predictions', JSON.stringify(predictions));
+        }
+        
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const text = document.getElementById('toast-text');
+            text.textContent = message;
+            toast.classList.remove('hidden');
+            setTimeout(() => { toast.style.transform = 'translateY(0)'; }, 50);
+            
+            setTimeout(() => {
+                toast.style.transform = 'translateY(80px)';
+                setTimeout(() => toast.classList.add('hidden'), 300);
+            }, 2500);
+        }
+        
+        function navigate(section) {
+            document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(`section-${section}`).classList.remove('hidden');
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('nav-active'));
+            
+            const navBtns = document.querySelectorAll('.nav-btn');
+            if(window.innerWidth >= 768) {
+                if (navBtns[section]) navBtns[section].classList.add('nav-active');
+            } else {
+                if (navBtns[section + 5]) navBtns[section + 5].classList.add('nav-active');
+            }
+            
+            if (section === 0) renderRanking();
+            if (section === 1) renderMembers();
+            if (section === 3) {
+                renderMemberSelector();
+                loadMemberPredictions();
+            }
+            if (section === 4) renderRealMatches();
+        }
+        
+        // SECCIÓN PARTICIPANTES
+        function renderMembers() {
+            const container = document.getElementById('members-list');
+            container.innerHTML = '';
+            document.getElementById('member-count').textContent = members.length;
+            
+            if (members.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-zinc-900 border border-dashed border-zinc-800 rounded-2xl p-8 text-center text-zinc-500 text-sm">
+                        No hay participantes registrados todavía.
+                    </div>`;
+                return;
+            }
+            
+            members.forEach((member, index) => {
+                const div = document.createElement('div');
+                div.className = "bg-zinc-900 border border-zinc-850 hover:border-zinc-800 px-4 py-3 rounded-xl flex justify-between items-center group transition-colors";
+                div.innerHTML = `
+                    <div class="flex items-center gap-x-3">
+                        <div class="w-7 h-7 bg-zinc-800 text-emerald-400 rounded-lg flex items-center justify-center font-mono text-xs font-bold">${index+1}</div>
+                        <span class="text-sm font-semibold text-zinc-200">${member}</span>
+                    </div>
+                    <button onclick="removeMember('${member}')" class="text-zinc-500 hover:text-red-400 p-1.5 transition-colors">
+                        <i class="fas fa-trash-alt text-xs"></i>
+                    </button>
+                `;
+                container.appendChild(div);
+            });
+        }
+        
+        function addMember() {
+            const input = document.getElementById('new-member-name');
+            const name = input.value.trim();
+            if (!name) return;
+            if (members.includes(name)) {
+                showToast("Este participante ya está registrado.");
+                return;
+            }
+            members.push(name);
+            saveData();
+            renderMembers();
+            input.value = '';
+            showToast(`¡${name} se unió a la quiniela!`);
+            renderMemberSelector();
+        }
+        
+        function removeMember(name) {
+            if (!confirm(`¿Estás seguro de eliminar a ${name}? Se perderán sus pronósticos.`)) return;
+            members = members.filter(m => m !== name);
+            delete predictions[name];
+            saveData();
+            renderMembers();
+            renderMemberSelector();
+            showToast(`Participante eliminado.`);
+        }
+        
+        // SECCIÓN MARCADOR REAL (FIXTURE)
+        function populateTeamSelects() {
+            const selects = [document.getElementById('new-home-team'), document.getElementById('new-away-team')];
+            selects.forEach(select => {
+                if (!select) return;
+                select.innerHTML = '<option value="" disabled selected>Selecciona un país...</option>';
+                teams.forEach(team => {
+                    const opt = document.createElement('option');
+                    opt.value = team;
+                    opt.textContent = team;
+                    select.appendChild(opt);
+                });
+            });
+        }
+        
+        function renderRealMatches() {
+            const container = document.getElementById('real-matches-list');
+            container.innerHTML = '';
+            
+            if (realMatches.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-zinc-900 border border-dashed border-zinc-850 rounded-3xl py-12 text-center max-w-xl mx-auto">
+                        <i class="fas fa-calendar text-4xl text-zinc-700 mb-2"></i>
+                        <p class="text-zinc-400 text-sm">El fixture está vacío. Programa partidos para la quiniela.</p>
+                    </div>`;
+                return;
+            }
+            
+            realMatches.forEach(match => {
+                const card = document.createElement('div');
+                card.className = "match-card bg-zinc-900 border border-zinc-850 rounded-2xl p-4 md:p-5 flex flex-col md:flex-row gap-4 items-center justify-between";
+                
+                const scoreHomeHtml = match.played ? match.homeG : `<input id="result-home-${match.id}" type="number" min="0" placeholder="-" class="w-10 h-9 bg-black border border-zinc-700 rounded-lg text-center font-bold text-sm focus:border-amber-400 outline-none text-white">`;
+                const scoreAwayHtml = match.played ? match.awayG : `<input id="result-away-${match.id}" type="number" min="0" placeholder="-" class="w-10 h-9 bg-black border border-zinc-700 rounded-lg text-center font-bold text-sm focus:border-amber-400 outline-none text-white">`;
+                
+                let actionButton = '';
+                let statusBadge = '';
+                
+                if (match.played) {
+                    statusBadge = `<span class="bg-emerald-950/80 text-emerald-400 border border-emerald-900/50 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md">Finalizado</span>`;
+                    actionButton = `
+                        <button onclick="resetRealMatchResult(${match.id})" title="Editar Resultado" class="text-zinc-400 hover:text-amber-400 p-2 transition-colors">
+                            <i class="fas fa-edit text-xs"></i>
+                        </button>
+                    `;
+                } else {
+                    statusBadge = `<span class="bg-amber-950/50 text-amber-400 border border-amber-900/30 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md">Sin Jugar</span>`;
+                    actionButton = `
+                        <button onclick="submitRealMatchResult(${match.id})" title="Guardar Resultado Final" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-colors flex items-center gap-x-1 shadow-md">
+                            <i class="fas fa-check"></i> Terminar
+                        </button>
+                    `;
+                }
+                
+                card.innerHTML = `
+                    <div class="flex items-center gap-x-3 w-full md:w-auto justify-between md:justify-start">
+                        ${statusBadge}
+                        <div class="flex items-center gap-x-4">
+                            <div class="flex items-center gap-x-2 text-right justify-end min-w-[100px] md:min-w-[140px]">
+                                <span class="text-sm font-semibold text-white tracking-tight">${match.home}</span>
+                            </div>
+                            <div class="flex items-center gap-x-1.5 font-mono">
+                                <div class="flex items-center justify-center">${scoreHomeHtml}</div>
+                                <span class="text-zinc-600 text-xs font-bold px-1">:</span>
+                                <div class="flex items-center justify-center">${scoreAwayHtml}</div>
+                            </div>
+                            <div class="flex items-center gap-x-2 justify-start min-w-[100px] md:min-w-[140px]">
+                                <span class="text-sm font-semibold text-white tracking-tight">${match.away}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-x-2 border-t border-zinc-800 md:border-none pt-3 md:pt-0 w-full md:w-auto justify-end">
+                        ${actionButton}
+                        <button onclick="deleteRealMatch(${match.id})" title="Eliminar Partido" class="text-zinc-500 hover:text-red-400 p-2 transition-colors">
+                            <i class="fas fa-trash-alt text-xs"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+        
+        function addRealMatch() {
+            document.getElementById('new-match-form').classList.remove('hidden');
+            populateTeamSelects();
+        }
+        
+        function cancelNewMatch() {
+            document.getElementById('new-match-form').classList.add('hidden');
+        }
+        
+        function saveNewRealMatch() {
+            const home = document.getElementById('new-home-team').value;
+            const away = document.getElementById('new-away-team').value;
+            
+            if (!home || !away) {
+                showToast("Por favor selecciona ambos equipos.");
+                return;
+            }
+            if (home === away) {
+                showToast("Un equipo no puede jugar contra sí mismo.");
+                return;
+            }
+            
+            realMatches.push({
+                id: currentMatchId++,
+                home: home,
+                away: away,
+                homeG: null,
+                awayG: null,
+                played: false
+            });
+            
+            saveData();
+            renderRealMatches();
+            cancelNewMatch();
+            showToast("Partido programado con éxito.");
+        }
+        
+        function submitRealMatchResult(id) {
+            const homeInput = document.getElementById(`result-home-${id}`);
+            const awayInput = document.getElementById(`result-away-${id}`);
+            
+            if (homeInput.value === '' || awayInput.value === '') {
+                showToast("Ingresa los goles para cerrar el partido.");
+                return;
+            }
+            
+            const mIdx = realMatches.findIndex(m => m.id === id);
+            if (mIdx !== -1) {
+                realMatches[mIdx].homeG = parseInt(homeInput.value);
+                realMatches[mIdx].awayG = parseInt(awayInput.value);
+                realMatches[mIdx].played = true;
+                
+                saveData();
+                renderRealMatches();
+                showToast("¡Resultado oficial guardado! Puntos actualizados.");
+            }
+        }
+        
+        function resetRealMatchResult(id) {
+            const mIdx = realMatches.findIndex(m => m.id === id);
+            if (mIdx !== -1) {
+                realMatches[mIdx].played = false;
+                saveData();
+                renderRealMatches();
+            }
+        }
+        
+        function deleteRealMatch(id) {
+            if (!confirm("¿Eliminar este partido del calendario y limpiar todos sus pronósticos?")) return;
+            realMatches = realMatches.filter(m => m !== id);
+            Object.keys(predictions).forEach(member => {
+                if (predictions[member][id]) delete predictions[member][id];
+            });
+            saveData();
+            renderRealMatches();
+        }
+        
+        // SECCIÓN PRONÓSTICOS
+        function renderMemberSelector() {
+            const select = document.getElementById('predict-member-select');
+            select.innerHTML = '';
+            members.forEach(member => {
+                const opt = document.createElement('option');
+                opt.value = member;
+                opt.textContent = member;
+                select.appendChild(opt);
+            });
+        }
+        
+        function loadMemberPredictions() {
+            const select = document.getElementById('predict-member-select');
+            const member = select.value;
+            const container = document.getElementById('predictions-list');
+            container.innerHTML = '';
+            
+            const noMatches = document.getElementById('no-matches-msg');
+            if (realMatches.length === 0) {
+                noMatches.classList.remove('hidden');
+                return;
+            }
+            noMatches.classList.add('hidden');
+            if (!member) {
+                container.innerHTML = `<p class="text-zinc-500 text-sm text-center col-span-full">Crea un participante en la pestaña Miembros primero.</p>`;
+                return;
+            }
+            
+            if (!predictions[member]) predictions[member] = {};
+            
+            realMatches.forEach(match => {
+                const currentPred = predictions[member][match.id] || {homeG: null, awayG: null};
+                
+                const card = document.createElement('div');
+                const statusBorder = match.played ? 'border-zinc-800 opacity-80 bg-zinc-900/40' : 'border-zinc-850 bg-zinc-900';
+                card.className = `match-card border rounded-2xl p-4 flex flex-col justify-between ${statusBorder}`;
+                
+                let realLabelHtml = '';
+                if (match.played) {
+                    realLabelHtml = `<span class="bg-zinc-800 text-amber-400 text-[11px] px-2 py-0.5 rounded font-mono font-bold">Oficial: ${match.homeG} - ${match.awayG}</span>`;
+                } else {
+                    realLabelHtml = `<span class="text-zinc-500 text-[11px] uppercase font-bold tracking-wider italic"><i class="far fa-clock"></i> Pendiente</span>`;
+                }
+                
+                const homeValue = currentPred.homeG !== null ? currentPred.homeG : '';
+                const awayValue = currentPred.awayG !== null ? currentPred.awayG : '';
+                
+                card.innerHTML = `
+                    <div class="flex items-center justify-between mb-3 border-b border-zinc-800/60 pb-2">
+                        <span class="text-xs font-semibold text-zinc-400">Partido ID #${match.id}</span>
+                        ${realLabelHtml}
+                    </div>
+                    
+                    <div class="grid grid-cols-7 gap-x-2 items-center text-sm">
+                        <div class="col-span-2 text-right font-bold truncate pr-1 text-white">${match.home}</div>
+                        
+                        <div class="col-span-1 flex justify-end">
+                            <input type="number" min="0" placeholder="-" value="${homeValue}" 
+                                   oninput="savePrediction('${member}', ${match.id}, 'homeG', this.value)"
+                                   ${match.played ? 'disabled' : ''}
+                                   class="w-10 h-10 bg-black border border-zinc-700 focus:border-emerald-500 rounded-xl text-center text-base font-bold outline-none text-emerald-400 disabled:opacity-50 disabled:text-zinc-400">
+                        </div>
+                        
+                        <div class="col-span-1 text-center font-mono text-zinc-600 font-bold text-xs">VS</div>
+                        
+                        <div class="col-span-1 flex justify-start">
+                            <input type="number" min="0" placeholder="-" value="${awayValue}" 
+                                   oninput="savePrediction('${member}', ${match.id}, 'awayG', this.value)"
+                                   ${match.played ? 'disabled' : ''}
+                                   class="w-10 h-10 bg-black border border-zinc-700 focus:border-emerald-500 rounded-xl text-center text-base font-bold outline-none text-emerald-400 disabled:opacity-50 disabled:text-zinc-400">
+                        </div>
+                        
+                        <div class="col-span-2 text-left font-bold truncate pl-1 text-white">${match.away}</div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+        
+        window.savePrediction = function(member, matchId, field, value) {
+            if (!predictions[member]) predictions[member] = {};
+            if (!predictions[member][matchId]) predictions[member][matchId] = {homeG: null, awayG: null};
+            
+            if (value === '') {
+                predictions[member][matchId][field] = null;
+            } else {
+                predictions[member][matchId][field] = parseInt(value);
+            }
+            saveData();
+        };
+        
+        function calculatePointsForMember(member) {
+            if (!predictions[member] || realMatches.length === 0) return 0;
+            
+            let total = 0;
+            
+            realMatches.forEach(match => {
+                if (!match.played) return; 
+                
+                const pred = predictions[member][match.id];
+                if (!pred || pred.homeG === null || pred.awayG === null) return; 
+                
+                let pts = 0;
+                
+                const realResult = match.homeG > match.awayG ? 'home' : (match.homeG < match.awayG ? 'away' : 'draw');
+                const predResult = pred.homeG > pred.awayG ? 'home' : (pred.homeG < pred.awayG ? 'away' : 'draw');
+                
+                if (realResult === predResult) pts += 2;
+                if (pred.homeG === match.homeG) pts += 2;
+                if (pred.awayG === match.awayG) pts += 2;
+                
+                total += pts;
+            });
+            
+            return total;
+        }
+        
+        // SECCIÓN RANKING
+        function renderRanking() {
+            const container = document.getElementById('ranking-table');
+            
+            // Añadido un bloque de encabezado escondido visualmente que solo se activará en la imagen
+            container.innerHTML = `
+                <div id="screenshot-header" class="hidden bg-black p-6 border-b border-emerald-950 items-center gap-x-3">
+                    <div class="w-10 h-10 bg-emerald-500 rounded-2xl flex items-center justify-center text-white text-2xl font-bold">⚽</div>
+                    <div>
+                        <h2 class="font-bold text-2xl tracking-tight text-white uppercase" style="font-family: 'Roboto Condensed', sans-serif;">Ranking General</h2>
+                        <p class="text-emerald-400 text-xs font-semibold tracking-widest -mt-1">QUINIELA MUNDIAL 2026</p>
+                    </div>
+                </div>
+                <table class="w-full text-left border-collapse min-w-[550px]">
+                    <thead>
+                        <tr class="border-b border-zinc-800 bg-black/40">
+                            <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-zinc-400 w-16">Pos</th>
+                            <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-zinc-400 w-64">Participante</th>
+                            <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-zinc-400 text-left w-28">Puntos</th>
+                            <th class="py-4 px-6 text-xs font-bold uppercase tracking-wider text-zinc-400 text-left">Pronósticos Hechos</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ranking-body" class="text-sm divide-y divide-zinc-850"></tbody>
+                </table>
+            `;
+            
+            const tbody = document.getElementById('ranking-body');
+            
+            const ranked = members.map(member => {
+                const validPredsCount = Object.values(predictions[member] || {}).filter(p => p.homeG !== null && p.awayG !== null).length;
+                return {
+                    name: member,
+                    points: calculatePointsForMember(member),
+                    preds: validPredsCount
+                };
+            }).sort((a, b) => b.points - a.points);
+            
+            ranked.forEach((entry, idx) => {
+                const row = document.createElement('tr');
+                row.className = "hover:bg-zinc-800/40 transition-colors";
+                
+                let posStyle = "text-emerald-400 text-xl";
+                if(idx === 0 && entry.points > 0) posStyle = "text-amber-400 font-bold text-2xl";
+                
+                tbody.appendChild(row);
+                row.innerHTML = `
+                    <td class="py-5 px-6 font-mono font-bold ${posStyle}">${idx + 1}</td>
+                    <td class="py-5 px-6 font-bold text-zinc-100 text-lg md:text-xl tracking-tight">${entry.name}</td>
+                    <td class="py-5 px-6 text-left">
+                        <span class="inline-flex items-center justify-center bg-emerald-950 text-emerald-400 font-mono text-2xl font-black px-4 py-1.5 rounded-2xl border border-emerald-900/80">${entry.points}</span>
+                    </td>
+                    <td class="py-5 px-6 text-left font-mono text-zinc-400 font-medium text-xs">${entry.preds} / ${realMatches.length}</td>
+                `;
+            });
+            
+            if (members.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="py-12 text-center text-zinc-500 font-medium">Ingresa participantes para organizar el ranking.</td></tr>`;
+            }
+        }
+        
+        function calculateAllPoints() {
+            renderRanking();
+            showToast("Tabla de posiciones sincronizada.");
+        }
+
+        // FUNCIÓN MEJORADA: Muestra el título del ranking en la captura y recorta solo la caja de datos activos
+        function takeRankingScreenshot() {
+            const table = document.getElementById('ranking-table');
+            const header = document.getElementById('screenshot-header');
+            if (!table) return;
+            
+            showToast("Generando captura recortada...");
+            
+            // Hacemos visible el título temporalmente para la foto
+            if (header) {
+                header.style.setProperty('display', 'flex', 'important');
+            }
+            
+            html2canvas(table, {
+                backgroundColor: '#09090b',
+                scale: 2, 
+                logging: false,
+                // Fuerza el renderizado al tamaño exacto que ocupan las celdas con datos
+                width: table.scrollWidth,
+                height: table.scrollHeight
+            }).then(canvas => {
+                // Ocultamos de nuevo el encabezado en la web original
+                if (header) {
+                    header.style.setProperty('display', 'none');
+                }
+                
+                const image = canvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.download = `ranking-quiniela-2026.png`;
+                link.href = image;
+                link.click();
+                showToast("¡Imagen del Ranking descargada con éxito!");
+            }).catch(err => {
+                if (header) {
+                    header.style.setProperty('display', 'none');
+                }
+                showToast("Error al generar la imagen.");
+                console.error(err);
+            });
+        }
+        
+        // EXPORT / IMPORT
+        function exportData() {
+            const data = { members, realMatches, predictions, exportedAt: new Date().toISOString() };
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `quiniela-mundial2026-backup.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast("Copia de seguridad descargada.");
+        }
+        
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    try {
+                        const data = JSON.parse(ev.target.result);
+                        if (data.members) members = data.members;
+                        if (data.realMatches) realMatches = data.realMatches;
+                        if (data.predictions) predictions = data.predictions;
+                        
+                        saveData();
+                        showToast("Datos cargados exitosamente.");
+                        renderMembers();
+                        renderRealMatches();
+                        renderRanking();
+                        renderMemberSelector();
+                    } catch(err) {
+                        showToast("Archivo JSON no válido.");
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+        
+        function clearAllData() {
+            if (!confirm("🚨 ¿ATENCIÓN: Quieres restablecer por completo la quiniela? Se borrará el historial sin retorno.")) return;
+            localStorage.clear();
+            members = []; realMatches = []; predictions = {}; currentMatchId = 1;
+            renderMembers(); renderRealMatches(); renderRanking(); renderMemberSelector();
+            showToast("Toda la base de datos fue limpiada.");
+        }
+        
+        function initialize() {
+            loadData();
+            renderMembers();
+            renderRealMatches();
+            renderRanking();
+            renderMemberSelector();
+            navigate(0);
+        }
+        
+        window.onload = initialize;
+    </script>
+</body>
+</html>
