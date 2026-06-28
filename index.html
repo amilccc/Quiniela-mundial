@@ -286,7 +286,6 @@
     </div>
 
     <script>
-        // LISTA OFICIAL Y COMPLETA DE LOS 48 PAÍSES CLASIFICADOS (MUNDIAL 2026)
         let teams = [
             "Alemania", "Arabia Saudita", "Argelia", "Argentina", "Australia", "Austria", 
             "Bélgica", "Bosnia y Herzegovina", "Brasil", "Cabo Verde", "Canadá", "Catar", 
@@ -360,7 +359,6 @@
             if (section === 4) renderRealMatches();
         }
         
-        // SECCIÓN PARTICIPANTES
         function renderMembers() {
             const container = document.getElementById('members-list');
             container.innerHTML = '';
@@ -416,7 +414,6 @@
             showToast(`Participante eliminado.`);
         }
         
-        // SECCIÓN MARCADOR REAL (FIXTURE)
         function populateTeamSelects() {
             const selects = [document.getElementById('new-home-team'), document.getElementById('new-away-team')];
             selects.forEach(select => {
@@ -568,7 +565,7 @@
         
         function deleteRealMatch(id) {
             if (!confirm("¿Eliminar este partido del calendario y limpiar todos sus pronósticos?")) return;
-            realMatches = realMatches.filter(m => m !== id);
+            realMatches = realMatches.filter(m => m.id !== id);
             Object.keys(predictions).forEach(member => {
                 if (predictions[member][id]) delete predictions[member][id];
             });
@@ -576,7 +573,6 @@
             renderRealMatches();
         }
         
-        // SECCIÓN PRONÓSTICOS
         function renderMemberSelector() {
             const select = document.getElementById('predict-member-select');
             select.innerHTML = '';
@@ -694,11 +690,9 @@
             return total;
         }
         
-        // SECCIÓN RANKING
         function renderRanking() {
             const container = document.getElementById('ranking-table');
             
-            // Añadido un bloque de encabezado escondido visualmente que solo se activará en la imagen
             container.innerHTML = `
                 <div id="screenshot-header" class="hidden bg-black p-6 border-b border-emerald-950 items-center gap-x-3">
                     <div class="w-10 h-10 bg-emerald-500 rounded-2xl flex items-center justify-center text-white text-2xl font-bold">⚽</div>
@@ -759,15 +753,14 @@
             showToast("Tabla de posiciones sincronizada.");
         }
 
-        // FUNCIÓN MEJORADA: Muestra el título del ranking en la captura y recorta solo la caja de datos activos
+        // FUNCIÓN MODIFICADA PARA COMPATIBILIDAD TOTAL CON IPHONE (iOS)
         function takeRankingScreenshot() {
             const table = document.getElementById('ranking-table');
             const header = document.getElementById('screenshot-header');
             if (!table) return;
             
-            showToast("Generando captura recortada...");
+            showToast("Generando captura para pantalla...");
             
-            // Hacemos visible el título temporalmente para la foto
             if (header) {
                 header.style.setProperty('display', 'flex', 'important');
             }
@@ -776,21 +769,51 @@
                 backgroundColor: '#09090b',
                 scale: 2, 
                 logging: false,
-                // Fuerza el renderizado al tamaño exacto que ocupan las celdas con datos
                 width: table.scrollWidth,
                 height: table.scrollHeight
             }).then(canvas => {
-                // Ocultamos de nuevo el encabezado en la web original
                 if (header) {
                     header.style.setProperty('display', 'none');
                 }
                 
                 const image = canvas.toDataURL('image/png');
-                const link = document.createElement('a');
-                link.download = `ranking-quiniela-2026.png`;
-                link.href = image;
-                link.click();
-                showToast("¡Imagen del Ranking descargada con éxito!");
+                
+                // DETECCIÓN DE IPHONE / IPAD (iOS)
+                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+                
+                if (isIOS) {
+                    // Solución iOS: Abre la imagen en una pestaña limpia
+                    const newWindow = window.open();
+                    if (newWindow) {
+                        newWindow.document.write(`
+                            <html lang="es">
+                            <head>
+                                <title>Quiniela 2026 - Captura</title>
+                                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                <style>
+                                    body { margin: 0; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; min-h: 100vh; font-family: sans-serif; color: #fff; text-align: center; padding: 20px; }
+                                    img { max-width: 100%; height: auto; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); margin-bottom: 20px; }
+                                    p { font-size: 14px; color: #a1a1aa; margin: 0; padding: 10px; background: #18181b; border-radius: 8px; }
+                                </style>
+                            </head>
+                            <body>
+                                <img src="${image}" alt="Ranking Quiniela">
+                                <p>☝️ Mantén presionada la imagen y selecciona <b>"Guardar en Fotos"</b> o compártela directamente.</p>
+                            </body>
+                            </html>
+                        `);
+                        newWindow.document.close();
+                    } else {
+                        showToast("¡Bloqueador de ventanas activado! Permite ventanas emergentes.");
+                    }
+                } else {
+                    // Solución Android y PC estándar
+                    const link = document.createElement('a');
+                    link.download = `ranking-quiniela-2026.png`;
+                    link.href = image;
+                    link.click();
+                    showToast("¡Imagen del Ranking descargada!");
+                }
             }).catch(err => {
                 if (header) {
                     header.style.setProperty('display', 'none');
@@ -800,7 +823,6 @@
             });
         }
         
-        // EXPORT / IMPORT
         function exportData() {
             const data = { members, realMatches, predictions, exportedAt: new Date().toISOString() };
             const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
